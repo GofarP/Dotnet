@@ -11,7 +11,7 @@ public static class DbInitializer
 
         var adminUser = new IdentityUser
         {
-            UserName = "admin@vending.com",
+            UserName = "admin",
             Email = "admin@vending.com",
             EmailConfirmed = true
         };

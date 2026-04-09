@@ -1,0 +1,97 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log in";
+    // Menggunakan layout khusus tanpa navbar
+    Layout = "/Views/Shared/_AuthLayout.cshtml"; 
+}
+
+<div class="flex min-h-screen flex-col justify-center py-12 px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-lg">
+        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-200">
+            <svg class="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+            </svg>
+        </div>
+        <h2 class="mt-8 text-center text-4xl font-black tracking-tight text-gray-900">
+            Vending IOT
+        </h2>
+        <p class="mt-3 text-center text-base text-gray-500">
+            Selamat datang kembali! Silakan masuk ke panel kontrol.
+        </p>
+    </div>
+
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-lg">
+        <div class="bg-white px-10 py-12 shadow-2xl shadow-slate-200 sm:rounded-3xl sm:px-16 border border-slate-100">
+            <form id="account" method="post" class="space-y-7">
+                
+                <div asp-validation-summary="ModelOnly" class="rounded-xl bg-red-50 p-4 text-sm text-red-600 border border-red-100" role="alert"></div>
+
+                <div>
+                    <label asp-for="Input.Email" class="block text-sm font-semibold text-gray-700 ml-1">Username atau Email</label>
+                    <div class="mt-2">
+                        <input asp-for="Input.Email" class="block w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-gray-900 shadow-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 focus:bg-white sm:text-sm transition-all outline-none" autocomplete="username" aria-required="true" placeholder="Masukkan admin/email" />
+                    </div>
+                    <span asp-validation-for="Input.Email" class="mt-2 block text-xs font-medium text-red-500 ml-1"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Input.Password" class="block text-sm font-semibold text-gray-700 ml-1">Password</label>
+                    <div class="mt-2">
+                        <input asp-for="Input.Password" class="block w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-gray-900 shadow-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 focus:bg-white sm:text-sm transition-all outline-none" autocomplete="current-password" aria-required="true" placeholder="••••••••" />
+                    </div>
+                    <span asp-validation-for="Input.Password" class="mt-2 block text-xs font-medium text-red-500 ml-1"></span>
+                </div>
+
+                <div class="flex items-center justify-between px-1">
+                    <div class="flex items-center">
+                        <input asp-for="Input.RememberMe" class="h-4 w-4 rounded-lg border-slate-300 text-indigo-600 focus:ring-indigo-600 cursor-pointer" />
+                        <label asp-for="Input.RememberMe" class="ml-2 block text-sm text-slate-600 cursor-pointer selection:bg-transparent">Ingat saya</label>
+                    </div>
+
+                    <div class="text-sm">
+                        <a id="forgot-password" asp-page="./ForgotPassword" class="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">Lupa sandi?</a>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button id="login-submit" type="submit" class="flex w-full justify-center rounded-2xl bg-indigo-600 px-4 py-3.5 text-sm font-bold text-white shadow-xl shadow-indigo-100 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 transition-all active:scale-[0.98]">
+                        Masuk Sekarang
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-10">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-slate-100"></div>
+                    </div>
+                    <div class="relative flex justify-center text-xs uppercase">
+                        <span class="bg-white px-3 text-slate-400 font-medium">Atau</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <p class="text-sm text-slate-500">
+                        Belum punya akses? 
+                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="font-bold text-indigo-600 hover:text-indigo-500 ml-1 underline underline-offset-4 decoration-indigo-200">
+                            Daftar User
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <p class="mt-8 text-center text-sm text-slate-400">
+            <a href="/" class="hover:text-slate-600 transition-colors flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Kembali ke Beranda
+            </a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
