@@ -1,0 +1,16 @@
+{
+  "name": "helloworld",
+  "version": "1.0.0",
+  "description": "ASP.NET Core with Tailwind CSS v4",
+  "scripts": {
+    "css:watch": "npx @tailwindcss/cli -i ./wwwroot/css/site.css -o ./wwwroot/css/app.css --watch",
+    "css:build": "npx @tailwindcss/cli -i ./wwwroot/css/site.css -o ./wwwroot/css/app.css",
+    "dotnet:watch": "dotnet watch run",
+    "dev": "concurrently \"npm run css:watch\" \"npm run dotnet:watch\"",
+    "build": "npm run css:build && dotnet build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "tailwindcss": "^4.0.0"
+  }
+}

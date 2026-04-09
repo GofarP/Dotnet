@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HelloWorld</title>
+    
+    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HelloWorld.styles.css" asp-append-version="true" />
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-900 flex flex-col min-h-screen">
+    <header class="bg-white border-b border-gray-200 shadow-sm">
+        <nav class="container mx-auto px-4 md:px-6">
+            <div class="flex h-16 items-center justify-between">
+                <div class="flex items-center gap-8">
+                    <a class="text-xl font-bold tracking-tight text-indigo-600 hover:text-indigo-700 transition-colors" 
+                       asp-area="" asp-controller="Home" asp-action="Index">
+                        HelloWorld
+                    </a>
+
+                    <div class="hidden md:flex gap-6">
+                        <a class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors" 
+                           asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        <a class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors" 
+                           asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button class="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container mx-auto px-4 md:px-6 flex-grow py-8">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="bg-white border-t border-gray-100 py-8 mt-auto">
+        <div class="container mx-auto px-4 md:px-6 text-center md:text-left text-sm text-gray-500">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p>&copy; 2026 - HelloWorld. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a class="hover:text-indigo-600 transition-colors" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                    <a class="hover:text-indigo-600 transition-colors" href="#">Terms</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>
