@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using HelloWorld.Data; // Pastikan folder 'Data' kamu berisi ApplicationDbContext.cs
+using HelloWorld.Data;
+using HelloWorld.Models; // Pastikan folder 'Data' kamu berisi ApplicationDbContext.cs
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 // 2. SETUP IDENTITY (Login & Register)
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false; // Set false agar tidak perlu verifikasi email saat dev
     options.Password.RequireDigit = false;
@@ -34,7 +35,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+        var userManager=services.GetRequiredService<UserManager<ApplicationUser>>();
 
         await DbInitializer.seed(context, userManager);
     }

@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Identity;
 using HelloWorld.Data;
+using HelloWorld.Models;
 
 public static class DbInitializer
 {
-    public static async Task seed(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+    public static async Task seed(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
         context.Database.EnsureCreated();
 
         if (context.Users.Any()) return;
 
-        var adminUser = new IdentityUser
+        var adminUser = new ApplicationUser
         {
             UserName = "admin",
             Email = "admin@vending.com",
