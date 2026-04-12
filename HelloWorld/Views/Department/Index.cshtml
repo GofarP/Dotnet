@@ -1,9 +1,10 @@
 @model IEnumerable<HelloWorld.Models.Department>
+
 @{
-    ViewData["Title"]="Daftar Department";
+    ViewData["Title"] = "Daftar Department";
 }
 
-<div class="container mx-auto mt-8 px-4 max-w-4xl">
+<div class="w-full mt-6 px-4 md:px-8">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-3xl font-bold text-gray-800">Daftar Department</h2>
         <a asp-action="Create" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow">
@@ -11,7 +12,48 @@
         </a>
     </div>
 
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        
+    <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
+        <table class="min-w-full leading-normal">
+            
+            <thead>
+                <tr class="bg-gray-50 text-gray-600 uppercase text-xs leading-normal font-semibold tracking-wider border-b border-gray-200">
+                    <th class="py-4 px-6 text-left">ID</th>
+                    <th class="py-4 px-6 text-left">Nama Department</th>
+                    <th class="py-4 px-6 text-left">Deskripsi</th>
+                    <th class="py-4 px-6 text-center">Aksi</th>
+                </tr>
+            </thead>
+            
+            <tbody class="text-gray-600 text-sm font-light">
+                
+                @* Looping data dari Model (Database) *@
+                @foreach (var item in Model) {
+                    <tr class="border-b border-gray-100 hover:bg-blue-50 transition-colors">
+                        <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-gray-500">
+                            @item.Id
+                        </td>
+                        <td class="py-3 px-6 text-left font-semibold text-gray-800">
+                            @item.Name
+                        </td>
+                        <td class="py-3 px-6 text-left text-gray-500 truncate max-w-xs">
+                            @item.Description
+                        </td>
+                        <td class="py-3 px-6 text-center flex justify-center space-x-3">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="text-blue-600 hover:text-blue-900 font-medium">Edit</a>
+                            <span class="text-gray-300">|</span>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="text-red-600 hover:text-red-900 font-medium">Hapus</a>
+                        </td>
+                    </tr>
+                }
+                
+            </tbody>
+        </table>
+
+        @if (!Model.Any())
+        {
+            <div class="p-8 text-center text-gray-500 bg-gray-50">
+                Belum ada data department. Silakan klik tombol "Tambah Baru" di atas.
+            </div>
+        }
     </div>
 </div>

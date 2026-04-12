@@ -42,9 +42,11 @@ public class DepartmentController : Controller
             _context.Departments.Add(department);
             await _context.SaveChangesAsync();
 
+            TempData["SuccessMessage"] = $"Department '{department.Name}' berhasil ditambahkan!";
             return RedirectToAction(nameof(Index));
         }
 
+        TempData["ErrorMessage"] = "Gagal menyimpan! Pastikan semua kolom diisi dengan benar.";
         return View(department);
     }
 
