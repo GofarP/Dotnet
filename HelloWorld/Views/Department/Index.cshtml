@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Daftar Department";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
 }
 
 <div class="w-full mt-6 px-4 md:px-8">
@@ -12,48 +14,137 @@
         </a>
     </div>
 
-    <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
-        <table class="min-w-full leading-normal">
+    <div class="mb-4 flex justify-end">
+        <div class="relative w-50">
+            <input type="text" id="searchInput" value="@ViewData["CurrentFilter"]"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                   placeholder="Ketik untuk mencari..." autocomplete="off" />
             
-            <thead>
-                <tr class="bg-gray-50 text-gray-600 uppercase text-xs leading-normal font-semibold tracking-wider border-b border-gray-200">
-                    <th class="py-4 px-6 text-left">ID</th>
-                    <th class="py-4 px-6 text-left">Nama Department</th>
-                    <th class="py-4 px-6 text-left">Deskripsi</th>
-                    <th class="py-4 px-6 text-center">Aksi</th>
-                </tr>
-            </thead>
-            
-            <tbody class="text-gray-600 text-sm font-light">
-                
-                @* Looping data dari Model (Database) *@
-                @foreach (var item in Model) {
-                    <tr class="border-b border-gray-100 hover:bg-blue-50 transition-colors">
-                        <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-gray-500">
-                            @item.Id
-                        </td>
-                        <td class="py-3 px-6 text-left font-semibold text-gray-800">
-                            @item.Name
-                        </td>
-                        <td class="py-3 px-6 text-left text-gray-500 truncate max-w-xs">
-                            @item.Description
-                        </td>
-                        <td class="py-3 px-6 text-center flex justify-center space-x-3">
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="text-blue-600 hover:text-blue-900 font-medium">Edit</a>
-                            <span class="text-gray-300">|</span>
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="text-red-600 hover:text-red-900 font-medium">Hapus</a>
-                        </td>
-                    </tr>
-                }
-                
-            </tbody>
-        </table>
+            <div id="searchSpinner" class="absolute right-3 top-2.5 hidden">
+                <svg class="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                     viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+            </div>
+        </div>
+    </div>
 
-        @if (!Model.Any())
+    <div id="dataContainer">
+        
+        <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr
+                        class="bg-gray-50 text-gray-600 uppercase text-xs leading-normal font-semibold tracking-wider border-b border-gray-200">
+                        <th class="py-4 px-6 text-left">ID</th>
+                        <th class="py-4 px-6 text-left">Nama Department</th>
+                        <th class="py-4 px-6 text-left">Deskripsi</th>
+                        <th class="py-4 px-6 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600 text-sm font-light">
+                    @foreach (var item in Model)
+                    {
+                        <tr class="border-b border-gray-100 hover:bg-blue-50 transition-colors">
+                            <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-gray-500">@item.Id</td>
+                            <td class="py-3 px-6 text-left font-semibold text-gray-800">@item.Name</td>
+                            <td class="py-3 px-6 text-left text-gray-500 truncate max-w-xs">@item.Description</td>
+                            <td class="py-3 px-6 text-center flex justify-center space-x-3">
+                                <a asp-action="Edit" asp-route-id="@item.Id"
+                                   class="text-blue-600 hover:text-blue-900 font-medium">Edit</a>
+                                <span class="text-gray-300">|</span>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post"
+                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus department ini?')">
+                                    <button type="submit"
+                                            class="text-red-600 hover:text-red-900 font-medium bg-transparent border-none p-0 cursor-pointer">
+                                        Hapus
+                                    </button>
+                                </form>
+                              
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if (!Model.Any())
+            {
+                <div class="p-8 text-center text-gray-500 bg-gray-50">
+                    Data tidak ditemukan.
+                </div>
+            }
+        </div>
+
+        @if (totalPages > 1)
         {
-            <div class="p-8 text-center text-gray-500 bg-gray-50">
-                Belum ada data department. Silakan klik tombol "Tambah Baru" di atas.
+            <div class="flex items-center justify-between mt-6">
+                <span class="text-sm text-gray-600">
+                    Halaman <span class="font-bold text-gray-800">@currentPage</span> dari <span
+                    class="font-bold text-gray-800">@totalPages</span>
+                </span>
+                <div class="flex gap-2">
+                    <a asp-action="Index" asp-route-pageNumber="@(currentPage - 1)"
+                           asp-route-searchString="@ViewData["CurrentFilter"]"
+                           class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium @(currentPage <= 1 ? "bg-gray-100 text-gray-400 pointer-events-none" : "bg-white text-gray-700 hover:bg-gray-50")">
+                        Sebelumnya
+                    </a>
+                    <a asp-action="Index" asp-route-pageNumber="@(currentPage + 1)"
+                           asp-route-searchString="@ViewData["CurrentFilter"]"
+                           class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium @(currentPage >= totalPages ? "bg-gray-100 text-gray-400 pointer-events-none" : "bg-white text-gray-700 hover:bg-gray-50")">
+                        Selanjutnya
+                    </a>
+                </div>
             </div>
         }
+
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        let typingTimer;
+        const doneTypingInterval = 500; // Menunggu 0.5 detik setelah berhenti mengetik
+
+        // Menggunakan event 'input' pada elemen dengan id searchInput
+        $('#searchInput').on('input', function () {
+            
+            // Hapus timer lama setiap kali mengetik huruf baru
+            clearTimeout(typingTimer);
+            
+            // Tampilkan animasi berputar (hapus class hidden)
+            $('#searchSpinner').removeClass('hidden');
+
+            // Mulai timer baru
+            typingTimer = setTimeout(() => {
+                const query = $(this).val(); // Ambil teks yang diketik
+                
+                // Gunakan jQuery AJAX ($.get) untuk memanggil Controller
+                $.get('@Url.Action("Index", "Department")', { searchString: query })
+                    .done(function (data) {
+                        // jQuery otomatis mem-parsing HTML balasan.
+                        // Kita tinggal cari elemen #dataContainer dari balasan tersebut, lalu ambil isinya.
+                        const newContent = $(data).find('#dataContainer').html();
+                        
+                        // Ganti isi tabel lama dengan yang baru
+                        $('#dataContainer').html(newContent);
+                        
+                        // Sembunyikan animasi berputar
+                        $('#searchSpinner').addClass('hidden');
+                        
+                        // Ubah URL di atas browser agar hasil pencarian bisa di-copy/refresh
+                        const newUrl = query ? `?searchString=${encodeURIComponent(query)}` : window.location.pathname;
+                        window.history.pushState({ path: newUrl }, '', newUrl);
+                    })
+                    .fail(function () {
+                        // Jaga-jaga kalau server error/mati
+                        console.error("Gagal mencari data.");
+                        $('#searchSpinner').addClass('hidden');
+                    });
+                    
+            }, doneTypingInterval);
+        });
+    </script>
+}

@@ -3,9 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using HelloWorld.Data;
 using HelloWorld.Models;
 using System.Security.Principal;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HelloWorld.Controllers;
 
+[Authorize]
 public class DepartmentController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -14,10 +16,32 @@ public class DepartmentController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string searchString, int pageNumber = 1)
     {
-        var departments = await _context.Departments.ToListAsync();
-        return View(departments);
+        int pageSize = 10;
+        var departments = _context.Departments.AsQueryable();
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            departments = departments.Where(d =>
+            d.Name.Contains(searchString) ||
+            d.Description.Contains(searchString));
+
+            ViewData["CurrentFilter"] = searchString;
+        }
+
+        int totalRecords = await departments.CountAsync();
+
+        int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+        var pagedData = await departments
+             .Skip((pageNumber - 1) * pageSize)
+             .Take(pageSize)
+             .ToListAsync();
+
+        ViewBag.TotalPages = totalPages;
+        ViewBag.CurrentPage = pageNumber;
+
+        return View(pagedData);
     }
 
     public async Task<IActionResult> Details(int? id)
@@ -62,28 +86,56 @@ public class DepartmentController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int? id)
+    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Department department)
     {
-        if (id == null) return NotFound();
+        // Pastikan ID di URL sama dengan ID dari form tersembunyi
+        if (id != department.Id)
+        {
+            return NotFound();
+        }
 
-        var department = await _context.Departments.FirstOrDefaultAsync(m => m.Id == id);
-        if (department == null) return NotFound();
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                // Update data di database
+                _context.Update(department);
+                await _context.SaveChangesAsync();
 
+                // Pesan sukses
+                TempData["SuccessMessage"] = $"Department '{department.Name}' berhasil diperbarui!";
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!DepartmentExists(department.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        TempData["ErrorMessage"] = "Gagal mengubah data! Silakan periksa kembali isian form.";
         return View(department);
     }
 
-    [HttpPost, ActionName("Delete")]
+
+
+    [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
+    public async Task<IActionResult> Delete(int id)
     {
         var department = await _context.Departments.FindAsync(id);
         if (department != null)
         {
             _context.Departments.Remove(department);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Data berhasil dihapus!";
         }
-
-        await _context.SaveChangesAsync();
-
         return RedirectToAction(nameof(Index));
     }
 
