@@ -11,11 +11,17 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
     }
 
-    public DbSet<Department> Departments {get; set;}
-    
+    public DbSet<Department> Departments { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+
+   protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(builder); 
+
+        builder.Entity<ApplicationUser>()
+            .HasOne(u => u.Department)
+            .WithMany()
+            .HasForeignKey(u => u.DepartmentId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

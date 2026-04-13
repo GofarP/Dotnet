@@ -1,0 +1,167 @@
+@model IEnumerable<HelloWorld.Models.ApplicationUser>
+@{
+    ViewData["Title"] = "Daftar Karyawan";
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+}
+
+<div class="w-full mt-6 px-4 md:px-8">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold text-gray-800">Daftar Pegawai</h2>
+        <a asp-action="Create" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow transition-all">
+            + Tambah Baru
+        </a>
+    </div>
+
+    <div class="mb-4 flex justify-end">
+        <div class="relative w-full md:w-80">
+            <input type="text" id="searchInput" value="@ViewData["CurrentFilter"]"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                   placeholder="Cari nama, email, atau jabatan..." autocomplete="off" />
+            
+            <div id="searchSpinner" class="absolute right-3 top-2.5 hidden">
+                <svg class="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div id="dataContainer">
+        <div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-600 uppercase text-xs leading-normal font-semibold tracking-wider border-b border-gray-200">
+                        <th class="py-4 px-6 text-left">Nama</th>
+                        <th class="py-4 px-6 text-left">Kontak</th>
+                        <th class="py-4 px-6 text-left">Department</th>
+                        <th class="py-4 px-6 text-left">Jabatan</th>
+                        <th class="py-4 px-6 text-center">Status</th>
+                        <th class="py-4 px-6 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600 text-sm font-light">
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="py-10 text-center text-gray-500">Data karyawan tidak ditemukan.</td>
+                        </tr>
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                            <td class="py-4 px-6 text-left">
+                                <div class="font-bold text-gray-800">@item.FullName</div>
+                            </td>
+                            <td class="py-4 px-6 text-left">
+                                <div class="text-xs text-gray-500">@item.Email</div>
+                                <div class="text-xs text-gray-400">@item.PhoneNumber</div>
+                            </td>
+                            <td class="py-4 px-6 text-left">
+                                <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-semibold">
+                                    @(item.Department?.Name ?? "-")
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 text-left">
+                                <span class="text-gray-600">@item.Position</span>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                @if (item.IsActive == true)
+                                {
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-bold">Nonaktif</span>
+                                }
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <div class="flex justify-center items-center gap-3">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-blue-600 hover:text-blue-900 font-medium">Edit</a>
+                                    <span class="text-gray-300">|</span>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Hapus karyawan ini?')">
+                                        <button type="submit" class="text-red-600 hover:text-red-900 font-medium">Hapus</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div class="flex items-center justify-between mt-6 px-4 pb-4">
+                <div class="text-sm text-gray-500 italic">
+                    Halaman @currentPage dari @totalPages
+                </div>
+                <div class="inline-flex shadow-sm rounded-md" role="group">
+                    <a asp-action="Index" asp-route-pageNumber="@(currentPage - 1)" asp-route-searchString="@ViewData["CurrentFilter"]"
+                       class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-l-lg @(currentPage <= 1 ? "bg-gray-100 text-gray-400 pointer-events-none" : "bg-white text-gray-700 hover:bg-gray-50")">
+                        Prev
+                    </a>
+
+                    @{
+                        int windowSize = 2;
+                        int startPage = Math.Max(1, currentPage - windowSize);
+                        int endPage = Math.Min(totalPages, currentPage + windowSize);
+
+                        if (startPage > 1)
+                        {
+                            <a asp-action="Index" asp-route-pageNumber="1" class="px-4 py-2 text-sm border-t border-b border-r border-gray-300 bg-white text-gray-700">1</a>
+                            if (startPage > 2) { <span class="px-4 py-2 text-sm border-t border-b border-r border-gray-300 bg-gray-50">...</span> }
+                        }
+
+                        for (int i = startPage; i <= endPage; i++)
+                        {
+                            <a asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@ViewData["CurrentFilter"]"
+                               class="px-4 py-2 text-sm font-medium border-t border-b border-r border-gray-300 transition-colors @(i == currentPage ? "bg-blue-600 text-white border-blue-600 z-10" : "bg-white text-gray-700 hover:bg-gray-50")">
+                                @i
+                            </a>
+                        }
+
+                        if (endPage < totalPages)
+                        {
+                            if (endPage < totalPages - 1) { <span class="px-4 py-2 text-sm border-t border-b border-r border-gray-300 bg-gray-50">...</span> }
+                            <a asp-action="Index" asp-route-pageNumber="@totalPages" class="px-4 py-2 text-sm border-t border-b border-r border-gray-300 bg-white text-gray-700">@totalPages</a>
+                        }
+                    }
+
+                    <a asp-action="Index" asp-route-pageNumber="@(currentPage + 1)" asp-route-searchString="@ViewData["CurrentFilter"]"
+                       class="px-4 py-2 text-sm font-medium border-t border-b border-r border-gray-300 rounded-r-lg @(currentPage >= totalPages ? "bg-gray-100 text-gray-400 pointer-events-none" : "bg-white text-gray-700 hover:bg-gray-50")">
+                        Next
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // JQUERY LIVE SEARCH
+        let typingTimer;
+        const doneTypingInterval = 500;
+
+        $('#searchInput').on('input', function () {
+            clearTimeout(typingTimer);
+            $('#searchSpinner').removeClass('hidden');
+
+            typingTimer = setTimeout(() => {
+                const query = $(this).val();
+                
+                $.get('@Url.Action("Index", "Employee")', { searchString: query })
+                    .done(function (data) {
+                        const newContent = $(data).find('#dataContainer').html();
+                        $('#dataContainer').html(newContent);
+                        $('#searchSpinner').addClass('hidden');
+
+                        const newUrl = query ? `?searchString=${encodeURIComponent(query)}` : window.location.pathname;
+                        window.history.pushState({ path: newUrl }, '', newUrl);
+                    });
+            }, doneTypingInterval);
+        });
+    </script>
+}

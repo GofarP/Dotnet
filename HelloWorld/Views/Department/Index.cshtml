@@ -80,22 +80,62 @@
 
         @if (totalPages > 1)
         {
-            <div class="flex items-center justify-between mt-6">
-                <span class="text-sm text-gray-600">
+            <div class="flex items-center justify-between mt-6 px-4 pb-4">
+                <div class="text-sm text-gray-600">
                     Halaman <span class="font-bold text-gray-800">@currentPage</span> dari <span
                     class="font-bold text-gray-800">@totalPages</span>
-                </span>
-                <div class="flex gap-2">
+                </div>
+                <div class="inline-flex shadow-sm rounded-md" role="group">
                     <a asp-action="Index" asp-route-pageNumber="@(currentPage - 1)"
                            asp-route-searchString="@ViewData["CurrentFilter"]"
-                           class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium @(currentPage <= 1 ? "bg-gray-100 text-gray-400 pointer-events-none" : "bg-white text-gray-700 hover:bg-gray-50")">
-                        Sebelumnya
+                           class="px-4 py-2 text-sm font-medium border border-gray-300 rounded-l-lg @(currentPage <= 1 ? "bg-gray-100 text-gray-400 pointer-events-none" : "bg-white text-gray-700 hover:bg-gray-50")">
+                        Prev
                     </a>
-                    <a asp-action="Index" asp-route-pageNumber="@(currentPage + 1)"
-                           asp-route-searchString="@ViewData["CurrentFilter"]"
-                           class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium @(currentPage >= totalPages ? "bg-gray-100 text-gray-400 pointer-events-none" : "bg-white text-gray-700 hover:bg-gray-50")">
-                        Selanjutnya
-                    </a>
+                    @{
+                        int windowSize = 2;
+                        int startPage = Math.Max(1, currentPage - windowSize);
+                        int endPage = Math.Min(totalPages, currentPage + windowSize);
+
+                        if (startPage > 1)
+                        {
+                            <a asp-action="Index" asp-route-pageNumber="1" asp-route-searchString="@ViewData["CurrentFilter"]"
+                               class="px-4 py-2 text-sm font-medium border-t border-b border-r border-gray-300 bg-white text-gray-700 hover:bg-gray-50">1</a>
+
+                            if (startPage > 2)
+                            {
+                                <span
+                                class="px-4 py-2 text-sm font-medium border-t border-b border-r border-gray-300 bg-gray-50 text-gray-400">...</span>
+                            }
+
+                        }
+
+                        for (int i = startPage; i <= endPage; i++)
+                        {
+                            <a asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@ViewData["CurrentFilter"]"
+                                   class="px-4 py-2 text-sm font-medium border-t border-b border-r border-gray-300 transition-colors @(i == currentPage ? "bg-blue-600 text-white border-blue-600 z-10" : "bg-white text-gray-700 hover:bg-gray-50")">
+                                @i
+                            </a>
+                        }
+
+                        if (endPage < totalPages)
+                        {
+                            if (endPage < totalPages - 1)
+                            {
+                                <span
+                                class="px-4 py-2 text-sm font-medium border-t border-b border-r border-gray-300 bg-gray-50 text-gray-400">...</span>
+                            }
+                            <a asp-action="Index" asp-route-pageNumber="@totalPages"
+                               asp-route-searchString="@ViewData["CurrentFilter"]"
+                               class="px-4 py-2 text-sm font-medium border-t border-b border-r border-gray-300 bg-white text-gray-700 hover:bg-gray-50">@totalPages</a>
+
+                        }
+
+                        <a asp-action="Index" asp-route-pageNumber="@(currentPage + 1)"
+                               asp-route-searchString="@ViewData["CurrentFilter"]"
+                               class="px-4 py-2 text-sm font-medium border-t border-b border-r border-gray-300 rounded-r-lg @(currentPage >= totalPages ? "bg-gray-100 text-gray-400 pointer-events-none" : "bg-white text-gray-700 hover:bg-gray-50")">
+                            Next
+                        </a>
+                    }
                 </div>
             </div>
         }
