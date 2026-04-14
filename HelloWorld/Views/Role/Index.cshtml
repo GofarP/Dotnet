@@ -1,0 +1,41 @@
+@using Microsoft.AspNetCore.Identity
+@model IEnumerable<IdentityRole>
+
+<div class="p-8">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Manajemen Role</h2>
+        <a asp-action="Create" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow">
+            + Tambah Role
+        </a>
+    </div>
+
+    <div class="bg-white shadow rounded-xl overflow-hidden border border-gray-100">
+        <table class="min-w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">Nama Role</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase">ID Role</th>
+                    <th class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-sm">
+                @foreach (var role in Model)
+                {
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 font-medium text-gray-900">
+                            <span class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded text-xs font-bold">
+                                @role.Name
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-gray-500">@role.Id</td>
+                        <td class="px-6 py-4 text-center">
+                            <form asp-action="Delete" asp-route-id="@role.Id" method="post" onsubmit="return confirm('Hapus role ini?')">
+                                <button type="submit" class="text-red-600 hover:text-red-900 font-semibold">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
