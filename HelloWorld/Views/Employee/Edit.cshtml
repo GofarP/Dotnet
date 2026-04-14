@@ -1,0 +1,79 @@
+@model HelloWorld.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Edit Data Karyawan";
+}
+
+<div class="w-full mt-6 px-4 md:px-8">
+    <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
+        <div class="bg-blue-50 px-8 py-6 border-b border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-800">Edit Data Karyawan</h2>
+            <p class="text-sm text-gray-500">Perbarui informasi karyawan atau ubah status akun di sini.</p>
+        </div>
+
+        <form asp-action="Edit" method="post" class="p-8">
+            <input type="hidden" asp-for="Id" />
+            
+            <div asp-validation-summary="ModelOnly" class="mb-4 text-red-500 text-sm"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="col-span-2 md:col-span-1">
+                    <label asp-for="FullName" class="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap</label>
+                    <input asp-for="FullName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all" />
+                    <span asp-validation-for="FullName" class="text-red-500 text-xs mt-1"></span>
+                </div>
+
+                <div class="col-span-2 md:col-span-1">
+                    <label asp-for="Position" class="block text-sm font-semibold text-gray-700 mb-2">Jabatan / Posisi</label>
+                    <input asp-for="Position" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all" />
+                    <span asp-validation-for="Position" class="text-red-500 text-xs mt-1"></span>
+                </div>
+
+                <div class="col-span-2 md:col-span-1">
+                    <label asp-for="Email" class="block text-sm font-semibold text-gray-700 mb-2 text-gray-400">Email (Username)</label>
+                    <input asp-for="Email" type="email" class="w-full px-4 py-2 border border-gray-200 bg-gray-50 rounded-lg text-gray-500 cursor-not-allowed" readonly />
+                    <p class="text-[10px] text-gray-400 mt-1 italic">*Email digunakan sebagai identitas login dan tidak dapat diubah.</p>
+                </div>
+
+                <div class="col-span-2 md:col-span-1">
+                    <label asp-for="PhoneNumber" class="block text-sm font-semibold text-gray-700 mb-2">Nomor WhatsApp</label>
+                    <input asp-for="PhoneNumber" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all" />
+                </div>
+
+                <div class="col-span-2 md:col-span-1">
+                    <label asp-for="DepartmentId" class="block text-sm font-semibold text-gray-700 mb-2">Departemen</label>
+                    <select asp-for="DepartmentId" asp-items="ViewBag.DepartmentId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white transition-all">
+                        <option value="">-- Pilih Departemen --</option>
+                    </select>
+                </div>
+
+                <div class="col-span-2 md:col-span-1 flex items-center gap-2 mt-4">
+                    <input type="checkbox" 
+                           id="IsActive" 
+                           name="IsActive" 
+                           value="true" 
+                           class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
+                           @(Model.IsActive == true ? "checked" : "") />
+                    
+                    <input type="hidden" name="IsActive" value="false" />
+                    
+                    <label for="IsActive" class="text-sm font-bold text-gray-700 cursor-pointer">
+                        Status Akun Aktif
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-4 mt-10 pt-6 border-t border-gray-100">
+                <a asp-action="Index" class="text-gray-500 hover:text-gray-700 font-medium transition-colors text-sm">
+                    Kembali
+                </a>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-8 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
