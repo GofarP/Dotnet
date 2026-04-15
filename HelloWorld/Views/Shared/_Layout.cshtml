@@ -59,8 +59,8 @@
                     <span class="font-medium text-sm">Role</span>
                  </a>
 
-                 <a asp-controller="Claim" asp-action="Index"
-                class="flex items-center gap-3 px-6 py-3 transition-colors @(currentController == "Claim" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-white hover:bg-slate-800")">
+                 <a asp-controller="Permission" asp-action="Index"
+                class="flex items-center gap-3 px-6 py-3 transition-colors @(currentController == "Permission" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-white hover:bg-slate-800")">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                             d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -83,18 +83,22 @@
                     <span class="font-medium text-sm">Employee</span>
                 </a>
                 
-                <div class="px-6 text-sm font-normal text-slate-400 mt-2 mb-1 tracking-wide">
-                    Department
-                </div>
+                @if (User.HasClaim("Permission", "show.department"))
+                {
+                       <div class="px-6 text-sm font-normal text-slate-400 mt-2 mb-1 tracking-wide">
+                            Department
+                        </div>
 
-                <a asp-controller="Department" asp-action="Index"
-                       class="flex items-center gap-3 px-6 py-3 transition-colors @(currentController == "Department" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-white hover:bg-slate-800")">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M10 3h4v4h-4zM12 7v5M6 12h12M8 12v4M6 16h4v4h-4zM16 12v4M14 16h4v4h-4z" />
-                    </svg>
-                    <span class="font-medium text-sm">Department</span>
-                </a>
+                        <a asp-controller="Department" asp-action="Index"
+                            class="flex items-center gap-3 px-6 py-3 transition-colors @(currentController == "Department" ? "bg-blue-500 text-white" : "text-slate-400 hover:text-white hover:bg-slate-800")">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 3h4v4h-4zM12 7v5M6 12h12M8 12v4M6 16h4v4h-4zM16 12v4M14 16h4v4h-4z" />
+                            </svg>
+                            <span class="font-medium text-sm">Department</span>
+                        </a>
+                }
+             
 
 
                 <div class="px-6 text-sm font-normal text-slate-400 mt-2 mb-1 tracking-wide">

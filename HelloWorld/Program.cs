@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using HelloWorld.Data;
-using HelloWorld.Models; // Pastikan folder 'Data' kamu berisi ApplicationDbContext.cs
+using HelloWorld.Models;
+using HelloWorld.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +29,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 // 3. TAMBAHKAN LAYANAN MVC & RAZOR PAGES
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(); // Wajib ada untuk UI Identity bawaan
-
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

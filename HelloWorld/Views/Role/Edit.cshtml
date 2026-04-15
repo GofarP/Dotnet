@@ -1,11 +1,18 @@
 @using Microsoft.AspNetCore.Identity
 @model IdentityRole
 
-@{ ViewData["Title"] = "Edit Role"; }
+@{ 
+    ViewData["Title"] = "Edit Role";
+    // Ambil data dari ViewBag yang dikirim oleh Controller
+    var masterPermissions = ViewBag.MasterPermissions as IEnumerable<HelloWorld.Models.Permission>;
+    var currentPermissions = ViewBag.CurrentPermissions as List<string> ?? new List<string>();
+}
 
-<div class="p-8 max-w-lg mx-auto">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<div class="p-8 max-w-2xl mx-auto">
     <div class="bg-white shadow-xl rounded-2xl p-8 border border-gray-100">
-        <h2 class="text-xl font-bold text-gray-800 mb-6">Edit Nama Role</h2>
+        <h2 class="text-xl font-bold text-gray-800 mb-6">Edit Role & Izin</h2>
         
         <form asp-action="Edit" method="post">
             <input type="hidden" asp-for="Id" />
@@ -15,7 +22,25 @@
                 <input name="roleName" type="text" value="@Model.Name" 
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all" 
                        required />
-                <span class="text-xs text-gray-400 mt-2 block italic">*Mengubah nama role dapat mempengaruhi izin akses user terkait.</span>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Izin Akses (Permissions)</label>
+                <select name="selectedPermissions" class="select2-multiple w-full" multiple="multiple">
+                    @if (masterPermissions != null)
+                    {
+                        foreach (var p in masterPermissions)
+                        {
+                            // Logika Pre-select: Cek apakah nama izin ada di daftar izin saat ini
+                            bool isSelected = currentPermissions.Contains(p.Name);
+                            
+                            <option value="@p.Name" selected="@(isSelected ? "selected" : null)">
+                                @p.Name
+                            </option>
+                        }
+                    }
+                </select>
+                <p class="text-[10px] text-gray-400 mt-2 italic">*Hapus atau tambah izin dari daftar di atas untuk memperbarui akses role ini.</p>
             </div>
 
             <div class="flex items-center justify-end gap-4 border-t pt-6">
@@ -27,3 +52,42 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('.select2-multiple').select2({
+                placeholder: " Pilih atau hapus izin...",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
+
+    <style>
+        .select2-container--default .select2-selection--multiple {
+            border-color: #D1D5DB;
+            border-radius: 0.5rem;
+            padding: 4px 8px;
+            min-height: 42px;
+        }
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #6366F1;
+            outline: none;
+            ring: 2px;
+        }
+        /* Style untuk tag yang terpilih */
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #EEF2FF;
+            border: 1px solid #C7D2FE;
+            color: #4338CA;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+    </style>
+}
