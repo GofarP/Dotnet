@@ -13,10 +13,10 @@ public class ClaimController : Controller
         _roleManager = roleManager;
     }
 
-    // GET: Daftar Claim berdasarkan Role
+    // 1. LIST (INDEX)
     public async Task<IActionResult> Index(string roleId)
     {
-        if (string.IsNullOrEmpty(roleId)) return NotFound();
+        if (string.IsNullOrEmpty(roleId)) return RedirectToAction("Index", "Role");
 
         var role = await _roleManager.FindByIdAsync(roleId);
         if (role == null) return NotFound();
@@ -29,85 +29,78 @@ public class ClaimController : Controller
         return View(claims);
     }
 
-    // POST: Tambah Claim Baru
+    // 2. CREATE (GET)
+    public IActionResult Create(string roleId)
+    {
+        ViewBag.RoleId = roleId;
+        return View();
+    }
+
+    // CREATE (POST)
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(string roleId, string claimType, string claimValue)
     {
         var role = await _roleManager.FindByIdAsync(roleId);
-        if (role == null) return NotFound();
-
-        if (!string.IsNullOrEmpty(claimType) && !string.IsNullOrEmpty(claimValue))
+        if (role != null)
         {
-            var result = await _roleManager.AddClaimAsync(role, new Claim(claimType, claimValue));
-            if (result.Succeeded) TempData["SuccessMessage"] = "Izin berhasil ditambahkan!";
+            await _roleManager.AddClaimAsync(role, new Claim(claimType, claimValue));
+            TempData["SuccessMessage"] = "Izin berhasil ditambah!";
+            return RedirectToAction(nameof(Index), new { roleId });
         }
-
-        return RedirectToAction(nameof(Index), new { roleId = roleId });
+        return View();
     }
 
-    // GET: Form Edit Claim
-    [HttpGet]
-    public async Task<IActionResult> Edit(string roleId, string claimType, string claimValue)
+    // 3. EDIT (GET)
+    public async Task<IActionResult> Edit(string roleId, string type, string value)
     {
         var role = await _roleManager.FindByIdAsync(roleId);
         if (role == null) return NotFound();
 
-        var claims = await _roleManager.GetClaimsAsync(role);
-        var claim = claims.FirstOrDefault(c => c.Type == claimType && c.Value == claimValue);
-        if (claim == null) return NotFound();
-
         ViewBag.RoleId = roleId;
-        ViewBag.RoleName = role.Name;
-        ViewBag.OldType = claimType;
-        ViewBag.OldValue = claimValue;
+        ViewBag.OldType = type;
+        ViewBag.OldValue = value;
 
         return View();
     }
 
-    // POST: Simpan Perubahan Claim (Hapus Lama -> Tambah Baru)
+    // EDIT (POST)
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string roleId, string oldType, string oldValue, string newType, string newValue)
     {
         var role = await _roleManager.FindByIdAsync(roleId);
-        if (role == null) return NotFound();
-
-        var claims = await _roleManager.GetClaimsAsync(role);
-        var oldClaim = claims.FirstOrDefault(c => c.Type == oldType && c.Value == oldValue);
-
-        if (oldClaim != null)
+        if (role != null)
         {
-            // Identity tidak punya fungsi 'UpdateClaim', jadi harus hapus & tambah
-            await _roleManager.RemoveClaimAsync(role, oldClaim);
-            var result = await _roleManager.AddClaimAsync(role, new Claim(newType, newValue));
+            var claims = await _roleManager.GetClaimsAsync(role);
+            var claim = claims.FirstOrDefault(c => c.Type == oldType && c.Value == oldValue);
 
-            if (result.Succeeded)
+            if (claim != null)
             {
-                TempData["SuccessMessage"] = "Izin berhasil diperbarui!";
-                return RedirectToAction(nameof(Index), new { roleId = roleId });
+                await _roleManager.RemoveClaimAsync(role, claim);
+                await _roleManager.AddClaimAsync(role, new Claim(newType, newValue));
+                TempData["SuccessMessage"] = "Izin berhasil diubah!";
             }
         }
-        return View();
+        return RedirectToAction(nameof(Index), new { roleId });
     }
 
-    // POST: Hapus Claim
+    // 4. DELETE (POST)
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(string roleId, string claimType, string claimValue)
+    public async Task<IActionResult> Delete(string roleId, string type, string value)
     {
         var role = await _roleManager.FindByIdAsync(roleId);
-        if (role == null) return NotFound();
-
-        var claims = await _roleManager.GetClaimsAsync(role);
-        var claim = claims.FirstOrDefault(c => c.Type == claimType && c.Value == claimValue);
-
-        if (claim != null)
+        if (role != null)
         {
-            await _roleManager.RemoveClaimAsync(role, claim);
-            TempData["SuccessMessage"] = "Izin berhasil dihapus!";
+            var claims = await _roleManager.GetClaimsAsync(role);
+            var claim = claims.FirstOrDefault(c => c.Type == type && c.Value == value);
+            if (claim != null)
+            {
+                await _roleManager.RemoveClaimAsync(role, claim);
+                TempData["SuccessMessage"] = "Izin berhasil dihapus!";
+            }
         }
-
-        return RedirectToAction(nameof(Index), new { roleId = roleId });
+        return RedirectToAction(nameof(Index), new { roleId });
     }
 }
