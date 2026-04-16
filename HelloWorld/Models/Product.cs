@@ -8,19 +8,14 @@ public class Product
     [Key]
     public int Id { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Nama produk wajib diisi")]
     [StringLength(100)]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    [Required]
+    [Required(ErrorMessage = "Harga wajib diisi")]
     [Column(TypeName = "decimal(18,2)")]
     public decimal Price { get; set; }
 
     [Range(0, 500)]
     public int Stock { get; set; }
-
-    public int VendingMachineId { get; set; }
-
-    [ForeignKey("VendingMachineId")]
-    public virtual VendingMachine VendingMachine {get;set;}
 }

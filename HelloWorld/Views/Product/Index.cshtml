@@ -1,0 +1,94 @@
+@model IEnumerable<HelloWorld.Models.Product>
+@{
+    ViewData["Title"] = "Daftar Product";
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+}
+
+<div class="p-10 w-full bg-slate-50/50 min-h-screen">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-slate-800">Daftar Product</h1>
+        
+            <a asp-action="Create" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 transition-all shadow-md">
+                <span class="text-xl">+</span> Tambah Baru
+            </a>
+        
+    </div>
+
+    <div class="flex justify-end mb-6">
+        <form asp-action="Index" method="get" class="relative">
+            <input type="text" name="searchString" value="@ViewData["CurrentFilter"]"
+                   placeholder="Ketik untuk mencari..."
+                   class="w-80 px-4 py-2.5 border border-slate-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+            <button type="submit" class="hidden">Cari</button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-50 border-b border-slate-100">
+                    <th class="px-6 py-4 text-[13px] font-bold text-slate-500 uppercase tracking-wider w-20">ID</th>
+                    <th class="px-6 py-4 text-[13px] font-bold text-slate-500 uppercase tracking-wider">NAMA PRODUCT</th>
+                    <th class="px-6 py-4 text-[13px] font-bold text-slate-500 uppercase tracking-wider">HARGA & STOK</th>
+                    <th class="px-6 py-4 text-[13px] font-bold text-slate-500 uppercase tracking-wider text-center w-40">AKSI</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach (var item in Model)
+                {
+                    <tr class="hover:bg-slate-50/30 transition-colors">
+                        <td class="px-6 py-5 text-slate-600">@item.Id</td>
+                        <td class="px-6 py-5 font-bold text-slate-800">@item.Name</td>
+                        <td class="px-6 py-5 text-slate-400 text-sm">
+                            @item.Price.ToString("C0", new System.Globalization.CultureInfo("id-ID")) | @item.Stock Unit
+                        </td>
+                        <td class="px-6 py-5 text-center text-sm font-medium">
+                            <div class="flex justify-center items-center gap-2">
+
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="text-blue-600 hover:underline">Edit</a>
+                                
+                                
+
+                                    <span class="text-slate-200">|</span>
+                                
+
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Hapus product ini?')" class="inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="text-red-500 hover:underline">Hapus</button>
+                                    </form>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-sm text-slate-500 font-medium">
+            Halaman <span class="text-slate-800">@currentPage</span> dari <span class="text-slate-800">@totalPages</span>
+        </p>
+
+        <div class="flex items-center bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+            <a asp-action="Index" asp-route-pageNumber="@(currentPage - 1)" asp-route-searchString="@ViewData["CurrentFilter"]"
+               class="px-4 py-2 text-sm font-medium text-slate-400 hover:bg-slate-50 border-r border-slate-200 @(currentPage <= 1 ? "pointer-events-none opacity-50" : "")">
+                Prev
+            </a>
+
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <a asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@ViewData["CurrentFilter"]"
+                   class="px-4 py-2 text-sm font-bold border-r border-slate-200 transition-colors @(i == currentPage ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-50")">
+                    @i
+                </a>
+            }
+
+            <a asp-action="Index" asp-route-pageNumber="@(currentPage + 1)" asp-route-searchString="@ViewData["CurrentFilter"]"
+               class="px-4 py-2 text-sm font-medium text-slate-400 hover:bg-slate-50 @(currentPage >= totalPages ? "pointer-events-none opacity-50" : "")">
+                Next
+            </a>
+        </div>
+    </div>
+</div>

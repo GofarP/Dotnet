@@ -4,6 +4,7 @@ using HelloWorld.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HelloWorld.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260416123715_RemoveVendingMachineId")]
+    partial class RemoveVendingMachineId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,7 +126,7 @@ namespace HelloWorld.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departments", (string)null);
+                    b.ToTable("Departments");
                 });
 
             modelBuilder.Entity("HelloWorld.Models.Permission", b =>
@@ -145,7 +148,7 @@ namespace HelloWorld.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permissions", (string)null);
+                    b.ToTable("Permissions");
                 });
 
             modelBuilder.Entity("HelloWorld.Models.Product", b =>
@@ -167,10 +170,14 @@ namespace HelloWorld.Migrations
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
+                    b.Property<int>("VendingMachineId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("VendingMachineId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("HelloWorld.Models.VendingMachine", b =>
@@ -207,7 +214,7 @@ namespace HelloWorld.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VendingMachines", (string)null);
+                    b.ToTable("VendingMachines");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -356,7 +363,16 @@ namespace HelloWorld.Migrations
                     b.Navigation("Department");
                 });
 
-            
+            modelBuilder.Entity("HelloWorld.Models.Product", b =>
+                {
+                    b.HasOne("HelloWorld.Models.VendingMachine", "VendingMachine")
+                        .WithMany("Products")
+                        .HasForeignKey("VendingMachineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("VendingMachine");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {

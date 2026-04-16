@@ -14,6 +14,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Department> Departments { get; set; }
     public DbSet<Permission>Permissions{get; set;}
 
+    public DbSet<Product>Products{get;set;}
+
+    public DbSet<VendingMachine>VendingMachines{get; set;}
+
    protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder); 
