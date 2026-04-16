@@ -31,6 +31,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(); // Wajib ada untuk UI Identity bawaan
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+builder.Services.Configure<SecurityStampValidatorOptions>(options=>{
+    options.ValidationInterval=TimeSpan.FromSeconds(5); 
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

@@ -1,7 +1,10 @@
 @model HelloWorld.Models.ApplicationUser
 @{
     ViewData["Title"] = "Edit Data Karyawan";
+    var currentRoles = ViewBag.CurrentRoles as IList<string> ?? new List<string>();
 }
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 <div class="w-full mt-6 px-4 md:px-8">
     <div class="max-w-3xl mx-auto bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
@@ -46,6 +49,23 @@
                     </select>
                 </div>
 
+                <div class="col-span-2 md:col-span-1">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Akses Role (Akses Grup)</label>
+                    <select name="selectedRoles" class="select2-roles w-full" multiple="multiple">
+                        @if (ViewBag.Roles != null)
+                        {
+                            foreach (var role in (IEnumerable<Microsoft.AspNetCore.Identity.IdentityRole>)ViewBag.Roles)
+                            {
+                                bool isSelected = currentRoles.Contains(role.Name);
+                                <option value="@role.Name" selected="@(isSelected ? "selected" : null)">
+                                    @role.Name
+                                </option>
+                            }
+                        }
+                    </select>
+                    <p class="text-[10px] text-gray-400 mt-1 italic">*Hapus atau tambahkan role untuk mengubah hak akses karyawan.</p>
+                </div>
+
                 <div class="col-span-2 md:col-span-1 flex items-center gap-2 mt-4">
                     <input type="checkbox" 
                            id="IsActive" 
@@ -75,5 +95,39 @@
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function() {
+            $('.select2-roles').select2({
+                placeholder: " Pilih Hak Akses...",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
+
+    <style>
+        .select2-container--default .select2-selection--multiple {
+            border-color: #D1D5DB;
+            border-radius: 0.5rem;
+            padding: 3px;
+            min-height: 42px;
+        }
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #3B82F6;
+            outline: none;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #DBEAFE;
+            border: 1px solid #BFDBFE;
+            border-radius: 6px;
+            color: #1E40AF;
+            font-weight: 600;
+            padding: 2px 8px;
+        }
+    </style>
 }
