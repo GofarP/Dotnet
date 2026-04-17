@@ -1,0 +1,57 @@
+@model HelloWorld.Models.VendingMachine
+
+<div class="p-10 w-full bg-slate-50/50 min-h-screen flex justify-center">
+    <div class="w-full max-w-2xl">
+        <div class="mb-6">
+            <a asp-action="Index" class="text-blue-600 hover:underline text-sm font-medium">← Kembali ke Daftar</a>
+            <h1 class="text-3xl font-bold text-slate-800 mt-2">Tambah Mesin Baru</h1>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+            <form asp-action="Create" method="post" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Nama Mesin</label>
+                        <input asp-for="Name" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan nama mesin" />
+                        <span asp-validation-for="Name" class="text-red-500 text-xs"></span>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Serial Number</label>
+                        <input asp-for="SerialNumber" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Kapasitas</label>
+                        <input asp-for="Capacity" type="number" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Lokasi</label>
+                        <input asp-for="Location" class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Status</label>
+                        <select asp-for="Status" class="w-full px-4 py-2 border border-slate-200 rounded-lg bg-white">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Maintenance">Maintenance</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">Tgl Terakhir Restock</label>
+                        <input asp-for="LastRestockDate" type="date" class="w-full px-4 py-2 border border-slate-200 rounded-lg" />
+                    </div>
+                </div>
+
+                <div class="pt-6 flex justify-end gap-3">
+                    <button type="submit" class="bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-md">
+                        Simpan Mesin
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

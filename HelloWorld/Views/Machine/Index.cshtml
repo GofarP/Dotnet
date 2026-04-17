@@ -1,0 +1,142 @@
+@model IEnumerable<HelloWorld.Models.VendingMachine>
+@{
+    ViewData["Title"] = "Daftar Vending Machine";
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+    int pageSize = 10;
+    int rowNumber = ((currentPage - 1) * pageSize) + 1;
+}
+
+<div class="p-10 w-full bg-slate-50/50 min-h-screen">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-slate-800">Vending Machines</h1>
+        <a asp-action="Create"
+               class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-bold shadow-md transition-all">
+            + Tambah Mesin
+        </a>
+    </div>
+
+    @* Search Section *@
+    <div class="flex justify-end mb-6">
+        <form asp-action="Index" method="get" id="searchForm">
+            <input type="text" id="searchInput" name="searchString" value="@ViewData["CurrentFilter"]"
+                   placeholder="Cari nama atau serial..." autocomplete="off"
+                   class="w-80 px-4 py-2.5 border border-slate-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+        </form>
+    </div>
+
+    @* Table Section *@
+    <div class="bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-50 border-b border-slate-100">
+                    <th class="px-6 py-4 text-[13px] font-bold text-slate-500 uppercase w-16 text-center">NO</th>
+                    <th class="px-6 py-4 text-[13px] font-bold text-slate-500 uppercase">NAMA & SERIAL</th>
+                    <th class="px-6 py-4 text-[13px] font-bold text-slate-500 uppercase">LOKASI</th>
+                    <th class="px-6 py-4 text-[13px] font-bold text-slate-500 uppercase">KAPASITAS</th>
+                    <th class="px-6 py-4 text-[13px] font-bold text-slate-500 uppercase">STATUS</th>
+                    <th class="px-6 py-4 text-[13px] font-bold text-slate-500 uppercase text-center">AKSI</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="px-6 py-16 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                @* Icon Sad/Search Empty *@
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-200 mb-4" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                          d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p class="text-slate-500 font-bold text-lg">Vending Machine Tidak Ditemukan</p>
+                                <p class="text-slate-400 text-sm">Coba kata kunci lain atau hapus filter pencarian.</p>
+                    
+                                @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"]?.ToString()))
+                                {
+                                    <a asp-action="Index"
+                                           class="mt-4 text-blue-600 hover:text-blue-700 font-bold text-sm underline">
+                                        Hapus Pencarian
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr class="hover:bg-slate-50/30 transition-colors">
+                            <td class="px-6 py-5 text-slate-500 text-center font-medium">@(rowNumber++)</td>
+                            <td class="px-6 py-5">
+                                <div class="font-bold text-slate-800">@item.Name</div>
+                                <div class="text-xs text-slate-400">SN: @item.SerialNumber</div>
+                            </td>
+                            <td class="px-6 py-5 text-slate-600 text-sm">@item.Location</td>
+                            <td class="px-6 py-5 text-slate-600 text-sm">@item.Capacity Unit</td>
+                            <td class="px-6 py-5">
+                                <span
+                                    class="px-3 py-1 rounded-full text-[11px] font-bold uppercase @(item.Status.ToString() == "Active" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600")">
+                                    @item.Status
+                                </span>
+                            </td>
+                            <td class="px-6 py-5 text-center">
+                                <div class="flex justify-center gap-2 text-sm font-medium">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-blue-600 hover:underline">Edit</a>
+                                    <span class="text-slate-200">|</span>
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post"
+                                          onsubmit="return confirm('Hapus mesin ini?')" class="inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="text-red-500 hover:underline">Hapus</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* Pagination Section *@
+    <div class="mt-8 flex justify-between items-center">
+        <p class="text-sm text-slate-500">Halaman @currentPage dari @totalPages</p>
+        <div class="flex bg-white border border-slate-200 rounded-lg shadow-sm">
+            <a asp-action="Index" asp-route-pageNumber="@(currentPage - 1)"
+               asp-route-searchString="@ViewData["CurrentFilter"]"
+               class="px-4 py-2 text-sm border-r border-slate-200 @(currentPage <= 1 ? "opacity-30 pointer-events-none" : "hover:bg-slate-50")">Prev</a>
+            
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <a asp-action="Index" asp-route-pageNumber="@i" asp-route-searchString="@ViewData["CurrentFilter"]"
+                   class="px-4 py-2 text-sm font-bold border-r border-slate-200 @(i == currentPage ? "bg-blue-600 text-white" : "hover:bg-slate-50")">@i</a>
+            }
+
+            <a asp-action="Index" asp-route-pageNumber="@(currentPage + 1)"
+               asp-route-searchString="@ViewData["CurrentFilter"]"
+               class="px-4 py-2 text-sm @(currentPage >= totalPages ? "opacity-30 pointer-events-none" : "hover:bg-slate-50")">Next</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+    let timeout = null;
+
+    window.onload = () => {
+        if (searchInput.value !== "") {
+            const val = searchInput.value;
+            searchInput.value = '';
+            searchInput.value = val;
+            searchInput.focus();
+        }
+    };
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => searchForm.submit(), 500);
+    });
+</script>

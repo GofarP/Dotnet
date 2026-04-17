@@ -4,6 +4,7 @@ using HelloWorld.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HelloWorld.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260417071914_AddVendingMachineProduct")]
+    partial class AddVendingMachineProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,7 +126,7 @@ namespace HelloWorld.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departments", (string)null);
+                    b.ToTable("Departments");
                 });
 
             modelBuilder.Entity("HelloWorld.Models.Permission", b =>
@@ -145,7 +148,7 @@ namespace HelloWorld.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permissions", (string)null);
+                    b.ToTable("Permissions");
                 });
 
             modelBuilder.Entity("HelloWorld.Models.Product", b =>
@@ -169,7 +172,7 @@ namespace HelloWorld.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("HelloWorld.Models.VendingMachine", b =>
@@ -206,7 +209,7 @@ namespace HelloWorld.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VendingMachines", (string)null);
+                    b.ToTable("VendingMachines");
                 });
 
             modelBuilder.Entity("HelloWorld.Models.VendingMachineProduct", b =>
@@ -227,7 +230,7 @@ namespace HelloWorld.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("VendingMachineProducts", (string)null);
+                    b.ToTable("VendingMachineProducts");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

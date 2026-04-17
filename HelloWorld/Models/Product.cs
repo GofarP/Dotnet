@@ -17,4 +17,6 @@ public class Product
     public decimal Price { get; set; }
 
     public int Stock { get; set; }
+
+    public virtual ICollection<VendingMachineProduct> VendingMachineProducts { get; set; } = new List<VendingMachineProduct>();
 }

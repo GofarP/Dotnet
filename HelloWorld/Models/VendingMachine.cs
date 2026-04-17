@@ -24,7 +24,7 @@ public class VendingMachine
 
     public DateTime? LastRestockDate { get; set; }
 
-    public virtual ICollection<Product> Products {get; set;}=new List<Product>();
+    public virtual ICollection<VendingMachineProduct> VendingMachineProducts { get; set; } = new List<VendingMachineProduct>();
 }
 
 public enum VendingMachineStatus
