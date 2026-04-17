@@ -35,7 +35,14 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options=>{
     options.ValidationInterval=TimeSpan.FromSeconds(5); 
 });
 
+builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
 var app = builder.Build();
+
+app.MapGroup("/api/auth").MapIdentityApi<ApplicationUser>();
+app.UseAuthentication();
+app.UseAuthorization();
 
 using (var scope = app.Services.CreateScope())
 {
