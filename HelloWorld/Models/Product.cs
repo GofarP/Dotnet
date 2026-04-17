@@ -16,6 +16,5 @@ public class Product
     [Column(TypeName = "decimal(18,2)")]
     public decimal Price { get; set; }
 
-    [Range(0, 500)]
     public int Stock { get; set; }
 }
