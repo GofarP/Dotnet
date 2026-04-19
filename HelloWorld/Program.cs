@@ -4,86 +4,122 @@ using HelloWorld.Data;
 using HelloWorld.Models;
 using HelloWorld.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.CodeAnalysis.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' tidak ditemukan.");
 
-// Registrasi DbContext menggunakan MySQL (Sesuai kode yang kamu minta)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// 2. SETUP IDENTITY (Login & Register)
-builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+builder.Services.AddAuthentication(options =>
 {
-    options.SignIn.RequireConfirmedAccount = false; // Set false agar tidak perlu verifikasi email saat dev
-    options.Password.RequireDigit = false;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
+    options.DefaultScheme="SmartScheme";
+    options.DefaultChallengeScheme="SmartScheme";
+    options.DefaultAuthenticateScheme="SmartScheme";
+})
+.AddPolicyScheme("SmartScheme", "Bearer or Cookie", options =>
+{
+    options.ForwardDefaultSelector = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            return IdentityConstants.BearerScheme;
+        }     
+
+        return IdentityConstants.ApplicationScheme;
+    };
+});
+
+builder.Services.AddIdentityApiEndpoints<ApplicationUser>(options=>
+{
+    options.SignIn.RequireConfirmedAccount=false;
+    options.Password.RequireDigit=false;
+    options.Password.RequiredLength=6;
+    options.Password.RequireNonAlphanumeric=false;
+    options.Password.RequireUppercase=false; 
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// 3. TAMBAHKAN LAYANAN MVC & RAZOR PAGES
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages(); // Wajib ada untuk UI Identity bawaan
-builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
-builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
-builder.Services.Configure<SecurityStampValidatorOptions>(options=>{
+builder.Services.AddRazorPages();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath="/Identity/Account/Login";
+    options.AccessDeniedPath="/Identity/Account/AccessDenied";
+
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        }
+        else
+        {
+            context.Response.Redirect(context.RedirectUri);
+        }
+
+        return Task.CompletedTask;
+    };
+});
+
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
     options.ValidationInterval=TimeSpan.FromSeconds(5); 
 });
 
-builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+var app=builder.Build();
 
-var app = builder.Build();
-
-app.MapGroup("/api/auth").MapIdentityApi<ApplicationUser>();
-app.UseAuthentication();
-app.UseAuthorization();
-
-using (var scope = app.Services.CreateScope())
+using(var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
+    var services=scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<ApplicationDbContext>();
-        var userManager=services.GetRequiredService<UserManager<ApplicationUser>>();
-
+        var context=services.GetRequiredService<ApplicationDbContext>();
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         await DbInitializer.seed(context, userManager);
     }
-    catch (Exception ex)
+    catch(Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Terjadi kesalahan saat seeding database.");
+        logger.LogError(ex, "Terjadi kesalahan saat seeding.");
     }
 }
 
-// 4. KONFIGURASI HTTP PIPELINE (Middleware)
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-
-// Agar file CSS hasil build Tailwind (app.css) bisa diakses
 app.UseStaticFiles();
-
 app.UseRouting();
 
-// Wajib berurutan: Authentication dulu baru Authorization
+app.UseStatusCodePages(async context =>
+{
+   if (context.HttpContext.Response.StatusCode == StatusCodes.Status401Unauthorized &&
+        context.HttpContext.Request.Path.StartsWithSegments("/api"))
+    {
+        context.HttpContext.Response.ContentType="application/json";
+        var response=new {message="Unauthorized", detail="Access Unauthorized"};
+        await context.HttpContext.Response.WriteAsJsonAsync(response);
+    }
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 5. ATUR ROUTING
+app.MapGroup("/api/auth").MapIdentityApi<ApplicationUser>(); 
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages(); // Menghubungkan halaman Login/Register Identity
+app.MapRazorPages();
 
 app.Run();
+
